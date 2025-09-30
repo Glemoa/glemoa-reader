@@ -1,12 +1,5 @@
-server:
-  port: 8080
-
 spring:
   application:
-    name: collector-service
-  task:
-    scheduling:
-      pool:
-        size: 13
+    name: glemoa-reader
   profiles:
     active: local
