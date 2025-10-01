@@ -64,8 +64,6 @@ jobs:
       # 3. 서버에서 배포 스크립트 실행 (SSH)
       - name: Execute deployment script on server
         uses: appleboy/ssh-action@master
-        env:
-          APP_PORT: 8080   # 🔥 실제 서비스 포트 지정 싸ㅣ발 제발 좀 되라
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
@@ -73,19 +71,42 @@ jobs:
           command_timeout: 10m
           script: |
             cd /root
-            JAR_FILE=$(ls glemoa-reader-*.jar | tail -n 1)
 
-            pkill -f "$JAR_FILE" || true
-            sleep 10
+            APP_PORT=${APP_PORT:-8080}
+            echo "Using APP_PORT=$APP_PORT"
+
+            JAR_FILE=$(ls -1t /root/glemoa-reader*.jar 2>/dev/null | grep -v plain | head -n 1)
+
+            if [ -z "$JAR_FILE" ]; then
+              echo "❌ No JAR found in /root. Listing contents:"
+              ls -al /root
+              exit 1
+            fi
+
+            JAR_NAME=$(basename "$JAR_FILE")
+            echo "✅ Found jar: $JAR_NAME"
+
+            pkill -f "$JAR_NAME" || true
+            sleep 5
 
             nohup java -jar \
               -Dspring.profiles.active=prod \
               -Dspring.datasource.url=jdbc:mysql://localhost:3306/Glemoa \
-              -Dspring.datasource.username=${{ secrets.DB_USERNAME }} \
-              -Dspring.datasource.password=${{ secrets.DB_PASSWORD }} \
-              "$JAR_FILE" > app.log 2>&1 &
+              -Dspring.datasource.username='${{ secrets.DB_USERNAME }}' \
+              -Dspring.datasource.password='${{ secrets.DB_PASSWORD }}' \
+              "$JAR_NAME" > app.log 2>&1 &
 
-            echo "Waiting for application to start on port $APP_PORT..."
+            echo "Started $JAR_NAME, waiting for application to start on port $APP_PORT..."
+
+            if ! command -v nc >/dev/null 2>&1; then
+              echo "netcat not found, attempting to install..."
+              if command -v apt-get >/dev/null 2>&1; then
+                apt-get update && apt-get install -y netcat
+              elif command -v yum >/dev/null 2>&1; then
+                yum install -y nc
+              fi
+            fi
+
             timeout=300
             while ! nc -z localhost $APP_PORT && [ $timeout -gt 0 ]; do
               echo "Application not yet available. Waiting..."
@@ -95,7 +116,9 @@ jobs:
 
             if [ $timeout -le 0 ]; then
               echo "Error: Application failed to start within the timeout period."
+              echo "---- Last 200 lines of app.log ----"
+              tail -n 200 app.log || true
               exit 1
-            else
-              echo "Application is up and running!"
             fi
+
+            echo "Application is up and running on port $APP_PORT!"
