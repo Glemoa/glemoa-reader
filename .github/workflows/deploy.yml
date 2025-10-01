@@ -11,6 +11,7 @@ jobs:
   # Build 작업: 코드를 빌드하고 배포 파일을 준비합니다.
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       # 1. 소스 코드 체크아웃
       - name: Checkout code
@@ -70,6 +71,7 @@ jobs:
           command_timeout: 10m
           script: |
             cd /root
+            # JAR 파일 이름을 변수로 지정
             # JAR 파일 이름을 변수로 지정
             JAR_NAME="glemoa-reader.jar"
             
