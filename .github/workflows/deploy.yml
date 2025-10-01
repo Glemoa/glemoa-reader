@@ -64,6 +64,8 @@ jobs:
       # 3. 서버에서 배포 스크립트 실행 (SSH)
       - name: Execute deployment script on server
         uses: appleboy/ssh-action@master
+        env:
+          APP_PORT: 8080   # 🔥 실제 서비스 포트 지정
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
@@ -71,19 +73,17 @@ jobs:
           command_timeout: 10m
           script: |
             cd /root
-            JAR_NAME="glemoa-reader.jar"
-            
-            pkill -f "$JAR_NAME" || true
+            JAR_FILE=$(ls glemoa-reader-*.jar | tail -n 1)
+
+            pkill -f "$JAR_FILE" || true
             sleep 10
-            
+
             nohup java -jar \
               -Dspring.profiles.active=prod \
-              -Dspring.datasource.url=jdbc:mysql://${{ secrets.SERVER_HOST }}:3306/Glemoa \
+              -Dspring.datasource.url=jdbc:mysql://localhost:3306/Glemoa \
               -Dspring.datasource.username=${{ secrets.DB_USERNAME }} \
               -Dspring.datasource.password=${{ secrets.DB_PASSWORD }} \
-              "$JAR_NAME" > app.log 2>&1 & disown
-              
-            echo "Deployment script executed for $JAR_NAME"
+              "$JAR_FILE" > app.log 2>&1 &
 
             echo "Waiting for application to start on port $APP_PORT..."
             timeout=300
@@ -92,7 +92,7 @@ jobs:
               sleep 5
               timeout=$((timeout-5))
             done
-            
+
             if [ $timeout -le 0 ]; then
               echo "Error: Application failed to start within the timeout period."
               exit 1
