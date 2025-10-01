@@ -55,4 +55,7 @@ tasks.named('test') {
 // 빌드 될 떄 '0.0.1-SNAPSHOT' << 이거 안붙이게 함.
 tasks.withType(org.springframework.boot.gradle.tasks.bundling.BootJar) {
     archiveVersion.set('')
+
+    // 이 한 줄을 추가해서 -plain JAR 생성을 비활성화합니다.
+    plainJar.enabled = false
 }
