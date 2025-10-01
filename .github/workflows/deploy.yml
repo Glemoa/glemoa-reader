@@ -71,15 +71,11 @@ jobs:
           command_timeout: 10m
           script: |
             cd /root
-            # JAR 파일 이름을 변수로 지정
-            # JAR 파일 이름을 변수로 지정
             JAR_NAME="glemoa-reader.jar"
             
-            # 기존에 실행 중인 애플리케이션 종료
             pkill -f "$JAR_NAME" || true
             sleep 10
             
-            # 새 버전의 애플리케이션 실행
             nohup java -jar \
               -Dspring.profiles.active=prod \
               -Dspring.datasource.url=jdbc:mysql://${{ secrets.SERVER_HOST }}:3306/Glemoa \
