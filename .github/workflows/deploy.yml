@@ -86,7 +86,7 @@ jobs:
             echo "Deployment script executed for $JAR_NAME"
 
             echo "Waiting for application to start on port $APP_PORT..."
-            timeout=60 # 대기 시간 (60초)
+            timeout=300
             while ! nc -z localhost $APP_PORT && [ $timeout -gt 0 ]; do
               echo "Application not yet available. Waiting..."
               sleep 5
@@ -95,7 +95,7 @@ jobs:
             
             if [ $timeout -le 0 ]; then
               echo "Error: Application failed to start within the timeout period."
-              exit 1 # 오류 발생 시 GitHub Actions 실패
+              exit 1
             else
               echo "Application is up and running!"
             fi
