@@ -91,6 +91,7 @@ jobs:
 
             nohup java -jar \
               -Dspring.profiles.active=prod \
+              -DEUREKA_SERVER_URL=${{ secrets.EUREKA_SERVER_URL }} \
               -Dspring.datasource.url=jdbc:mysql://${{ secrets.DB_HOST }}:3306/Glemoa \
               -Dspring.datasource.username='${{ secrets.DB_USERNAME }}' \
               -Dspring.datasource.password='${{ secrets.DB_PASSWORD }}' \
