@@ -15,8 +15,18 @@ public class PostController {
         this.postService = postService;
     }
 
-    @GetMapping("/posts")
-    public List<PostDto> readPost(String source) {
-        return postService.readPost(source);
+    @GetMapping("/recent-posts")
+    public List<PostDto> readRecentPost(String source) {
+        return postService.readRecentPost(source);
+    }
+
+    @GetMapping("/today-recommended-posts")
+    public List<PostDto> readTodayRecommendedPosts(String source) {
+        return postService.readTodayRecommendedPosts(source);
+    }
+
+    @GetMapping("/today-view-count-posts")
+    public List<PostDto> readTodayViewCountPosts(String source) {
+        return postService.readTodayViewCountPosts(source);
     }
 }
