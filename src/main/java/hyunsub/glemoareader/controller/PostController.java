@@ -2,8 +2,7 @@ package hyunsub.glemoareader.controller;
 
 import hyunsub.glemoareader.dto.PostDto;
 import hyunsub.glemoareader.service.PostService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -13,6 +12,16 @@ public class PostController {
 
     public PostController(PostService postService) {
         this.postService = postService;
+    }
+
+    @GetMapping("/post/{postId}")
+    public PostDto findByPostId (@PathVariable("postId") Long postId) {
+        return postService.findById(postId);
+    }
+
+    @PostMapping("/post/viewBookMarkedPost")
+    public List<PostDto> viewBookMarkedPostByPostIdList(@RequestBody List<Long> postIdList) {
+        return postService.viewBookMarkedPostByPostIdList(postIdList);
     }
 
     @GetMapping("/recent-posts")
