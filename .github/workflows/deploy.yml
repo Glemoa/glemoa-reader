@@ -59,7 +59,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "*.jar"
-          target: "/root/" # 서버의 배포 디렉토리
+          target: "/home/ubuntu" # 서버의 배포 디렉토리
 
       # 3. 서버에서 배포 스크립트 실행 (SSH) 제발 되라 씨바랑
       - name: Execute deployment script on server
@@ -70,16 +70,16 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           command_timeout: 10m
           script: |
-            cd /root
+            cd /home/ubuntu
 
             APP_PORT=${APP_PORT:-8080}
             echo "Using APP_PORT=$APP_PORT"
 
-            JAR_FILE=$(ls -1t /root/glemoa-reader*.jar 2>/dev/null | grep -v plain | head -n 1)
+            JAR_FILE=$(ls -1t glemoa-reader*.jar 2>/dev/null | grep -v plain | head -n 1)
 
             if [ -z "$JAR_FILE" ]; then
-              echo "❌ No JAR found in /root. Listing contents:"
-              ls -al /root
+              echo "❌ No JAR found in /home/ubuntu. Listing contents:"
+              ls -al
               exit 1
             fi
 
