@@ -1,125 +1,132 @@
-## GitHub Actions 워크플로우의 이름을 지정합니다.
-#name: Deploy to Server
-#
-## 워크플로우가 트리거될 이벤트를 지정합니다.
-#on:
-#  push:
-#    branches:
-#      - main # main 브랜치에 푸시될 때 실행됩니다.
-#
-#jobs:
-#  # Build 작업: 코드를 빌드하고 배포 파일을 준비합니다.
-#  build:
-#    runs-on: ubuntu-latest
-#    timeout-minutes: 10
-#    steps:
-#      # 1. 소스 코드 체크아웃
-#      - name: Checkout code
-#        uses: actions/checkout@v4
-#
-#      # 2. JDK 21 설치
-#      - name: Set up JDK 21
-#        uses: actions/setup-java@v4
-#        with:
-#          java-version: '21'
-#          distribution: 'temurin'
-#
-#      # 3. gradlew 실행 권한 부여
-#      - name: Grant execute permission for gradlew
-#        run: chmod +x ./gradlew
-#
-#      # 4. Gradle로 빌드
-#      - name: Build with Gradle
-#        run: ./gradlew build --no-daemon
-#
-#      # 5. 빌드 결과물(JAR)을 아티팩트로 업로드
-#      - name: Upload artifact
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: app-jar
-#          path: build/libs/*.jar # 수정된 경로
-#
-#  # Deploy 작업: 빌드된 파일을 서버에 배포하고 실행합니다.
-#  deploy:
-#    needs: build # build 작업이 성공해야 실행됩니다.
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      # 1. 아티팩트 다운로드
-#      - name: Download artifact
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: app-jar
-#
-#      # 2. JAR 파일을 서버로 전송 (SCP)
-#      - name: Transfer JAR to server
-#        uses: appleboy/scp-action@master
-#        with:
-#          host: ${{ secrets.SERVER_HOST }}
-#          username: ${{ secrets.SERVER_USER }}
-#          key: ${{ secrets.SSH_PRIVATE_KEY }}
-#          source: "*.jar"
-#          target: "/home/ubuntu" # 서버의 배포 디렉토리
-#
-#      # 3. 서버에서 배포 스크립트 실행 (SSH) 제발 되라 씨바랑
-#      - name: Execute deployment script on server
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.SERVER_HOST }}
-#          username: ${{ secrets.SERVER_USER }}
-#          key: ${{ secrets.SSH_PRIVATE_KEY }}
-#          command_timeout: 10m
-#          script: |
-#            cd /home/ubuntu
-#
-#            APP_PORT=${APP_PORT:-8080}
-#            echo "Using APP_PORT=$APP_PORT"
-#
-#            JAR_FILE=$(ls -1t glemoa-reader*.jar 2>/dev/null | grep -v plain | head -n 1)
-#
-#            if [ -z "$JAR_FILE" ]; then
-#              echo "❌ No JAR found in /home/ubuntu. Listing contents:"
-#              ls -al
-#              exit 1
-#            fi
-#
-#            JAR_NAME=$(basename "$JAR_FILE")
-#            echo "✅ Found jar: $JAR_NAME"
-#
-#            pkill -f "$JAR_NAME" || true
-#            sleep 5
-#
-#            nohup java -jar \
-#              -Dspring.profiles.active=prod \
-#              -DEUREKA_SERVER_URL=${{ secrets.EUREKA_SERVER_URL }} \
-#              -Dspring.datasource.url=jdbc:mysql://${{ secrets.DB_HOST }}:3306/Glemoa \
-#              -Dspring.datasource.username='${{ secrets.DB_USERNAME }}' \
-#              -Dspring.datasource.password='${{ secrets.DB_PASSWORD }}' \
-#              "$JAR_NAME" > app.log 2>&1 &
-#
-#            echo "Started $JAR_NAME, waiting for application to start on port $APP_PORT..."
-#
-#            if ! command -v nc >/dev/null 2>&1; then
-#              echo "netcat not found, attempting to install..."
-#              if command -v apt-get >/dev/null 2>&1; then
-#                apt-get update && apt-get install -y netcat
-#              elif command -v yum >/dev/null 2>&1; then
-#                yum install -y nc
-#              fi
-#            fi
-#
-#            timeout=300
-#            while ! nc -z localhost $APP_PORT && [ $timeout -gt 0 ]; do
-#              echo "Application not yet available. Waiting..."
-#              sleep 5
-#              timeout=$((timeout-5))
-#            done
-#
-#            if [ $timeout -le 0 ]; then
-#              echo "Error: Application failed to start within the timeout period."
-#              echo "---- Last 200 lines of app.log ----"
-#              tail -n 200 app.log || true
-#              exit 1
-#            fi
-#
-#            echo "Application is up and running on port $APP_PORT!"
+# GitHub Actions 워크플로우의 이름을 지정합니다.
+name: Deploy Reader Service to Server
+
+# 워크플로우가 트리거될 이벤트를 지정합니다.
+on:
+  push:
+    branches:
+      - main # main 브랜치에 푸시될 때 실행됩니다.
+
+jobs:
+  # Build 작업: 코드를 빌드하고 배포 파일을 준비합니다.
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # 1. 소스 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. JDK 21 설치
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      # 3. gradlew 실행 권한 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      # 4. Gradle로 빌드
+      - name: Build with Gradle
+        run: ./gradlew build --no-daemon
+
+      # 5. 빌드 결과물(JAR)을 아티팩트로 업로드
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/*.jar
+
+  # Deploy 작업: 빌드된 파일을 서버에 배포하고 실행합니다.
+  deploy:
+    needs: build # build 작업이 성공해야 실행됩니다.
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 아티팩트 다운로드
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+
+      # 2. JAR 파일을 서버로 전송 (SCP)
+      - name: Transfer JAR to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "*.jar"
+          # 🚨 Reader 서비스 배포 디렉토리
+          target: "/home/ubuntu/reader/"
+
+      # 3. 서버에서 배포 스크립트 실행 (SSH)
+      - name: Execute deployment script on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 10m
+          script: |
+            DEPLOY_DIR="/home/ubuntu/reader"
+            mkdir -p $DEPLOY_DIR && cd $DEPLOY_DIR
+
+            APP_PORT=${APP_PORT:-8080}
+            echo "Using APP_PORT=$APP_PORT"
+
+            JAR_FILE=$(ls -1t glemoa-reader*.jar 2>/dev/null | grep -v plain | head -n 1)
+
+            if [ -z "$JAR_FILE" ]; then
+              echo "❌ No reader JAR found in $DEPLOY_DIR. Listing contents:"
+              ls -al .
+              exit 1
+            fi
+
+            JAR_NAME=$(basename "$JAR_FILE")
+            echo "✅ Found jar: $JAR_NAME"
+
+            pkill -f "$JAR_NAME" || true
+            sleep 5
+
+            nohup java -jar \
+              -Dspring.profiles.active=prod \
+              \
+              -Dserver.port=$APP_PORT \
+              \
+              -Deureka.client.serviceUrl.defaultZone=http://${{ secrets.EUREKA_SERVER_URL }}:8761/eureka/ \
+              \
+              -Dspring.datasource.url=jdbc:mysql://${{ secrets.DB_HOST }}:3306/Glemoa \
+              -Dspring.datasource.username=${{ secrets.DB_USERNAME }} \
+              -Dspring.datasource.password=${{ secrets.DB_PASSWORD }} \
+              \
+              "$JAR_NAME" > reader.log 2>&1 & # 로그 파일명 지정
+
+            echo "Started $JAR_NAME, waiting for application to start on port $APP_PORT..."
+
+            if ! command -v nc >/dev/null 2>&1; then
+              echo "netcat not found, attempting to install..."
+              if command -v apt-get >/dev/null 2>&1; then
+                apt-get update && apt-get install -y netcat
+              elif command -v yum >/dev/null 2>&1; then
+                yum install -y nc
+              fi
+            fi
+
+            timeout=300
+            while ! nc -z localhost $APP_PORT && [ $timeout -gt 0 ]; do
+              echo "Application not yet available. Waiting..."
+              sleep 5
+              timeout=$((timeout-5))
+            done
+
+            if [ $timeout -le 0 ]; then
+              echo "Error: Application failed to start within the timeout period."
+              echo "---- Last 200 lines of reader.log ----"
+              tail -n 200 reader.log || true
+              exit 1
+            fi
+
+            echo "Application is up and running on port $APP_PORT!"
