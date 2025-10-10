@@ -26,6 +26,7 @@ public class PostService {
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
 
         PostDto postDto = PostDto.builder()
+                .id(post.getId())
                 .title(post.getTitle())
                 .link(post.getLink())
                 .author(post.getAuthor())
@@ -48,6 +49,7 @@ public class PostService {
         // (findById 메서드의 DTO 변환 로직을 재사용하는 것이 좋습니다.)
         return posts.stream()
                 .map(post -> PostDto.builder()
+                        .id(post.getId())
                         .title(post.getTitle())
                         .link(post.getLink())
                         .author(post.getAuthor())
@@ -69,6 +71,7 @@ public class PostService {
         List<PostDto> postDtoList = new ArrayList<>();
         for(Post post : postLists) {
             postDtoList.add(PostDto.builder()
+                    .id(post.getId())
                     .title(post.getTitle())
                     .link(post.getLink())
                     .author(post.getAuthor())
@@ -91,6 +94,7 @@ public class PostService {
         List<PostDto> postDtoList = new ArrayList<>();
         for(Post post : postLists) {
             postDtoList.add(PostDto.builder()
+                    .id(post.getId())
                     .title(post.getTitle())
                     .link(post.getLink())
                     .author(post.getAuthor())
@@ -113,6 +117,7 @@ public class PostService {
         List<PostDto> postDtoList = new ArrayList<>();
         for(Post post : postLists) {
             postDtoList.add(PostDto.builder()
+                    .id(post.getId())
                     .title(post.getTitle())
                     .link(post.getLink())
                     .author(post.getAuthor())
