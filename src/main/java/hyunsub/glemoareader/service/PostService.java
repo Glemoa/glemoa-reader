@@ -41,13 +41,28 @@ public class PostService {
     }
 
     public List<PostDto> viewBookMarkedPostByPostIdList(List<Long> postIdList) {
-        // 1. PostRepository의 findAllById(Iterable<ID> ids) 메서드를 사용해 ID 리스트로 DB 조회
-        // 이 방법은 쿼리를 한 번만 실행하여 N+1 문제를 방지합니다.
+        // findAllById는 ID 순서를 보장하지 않으므로, 애플리케이션 레벨에서 순서를 맞춰줘야 합니다.
         List<Post> posts = postRepository.findAllById(postIdList);
 
-        // 2. Stream API를 사용하여 Post 엔티티 리스트를 PostDto 리스트로 변환
-        // (findById 메서드의 DTO 변환 로직을 재사용하는 것이 좋습니다.)
-        return posts.stream()
+        // ID를 키로, Post 객체를 값으로 하는 맵을 생성하여 빠른 조회를 가능하게 합니다.
+        java.util.Map<Long, Post> postMap = posts.stream()
+                .collect(Collectors.toMap(Post::getId, post -> post));
+
+        /*
+           1. postIdList.stream(): 파라미터로 받은, 북마크 생성 시간순으로 이미 정렬되어 있는 ID
+              목록을 순서대로 스트림으로 만듭니다.
+           2. .map(postMap::get): 스트림의 각 ID를 사용하여 postMap에서 해당 ID에 맞는 Post 객체를
+              찾습니다. 스트림은 순서를 유지하므로, postIdList의 순서대로 Post 객체가 매핑됩니다.
+           3. .collect(Collectors.toList()): 순서대로 매핑된 Post 객체들을 새로운
+              리스트(sortedPosts)로 만듭니다.
+         */
+        List<Post> sortedPosts = postIdList.stream()
+                .map(postMap::get)
+                .filter(java.util.Objects::nonNull) // 혹시 모를 null 값(삭제된 게시물 등)을 필터링합니다.
+                .collect(Collectors.toList());
+
+        // 정렬된 Post 리스트를 PostDto 리스트로 변환합니다.
+        return sortedPosts.stream()
                 .map(post -> PostDto.builder()
                         .id(post.getId())
                         .title(post.getTitle())
