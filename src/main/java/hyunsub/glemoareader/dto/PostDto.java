@@ -1,5 +1,6 @@
 package hyunsub.glemoareader.dto;
 
+import hyunsub.glemoareader.domain.Post;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,4 +22,18 @@ public class PostDto {
     private LocalDateTime createdAt;
     private Integer recommendationCount;
     private String source;
+
+    public static PostDto fromPost(Post post) {
+        return PostDto.builder()
+                .id(post.getId())
+                .title(post.getTitle())
+                .link(post.getLink())
+                .author(post.getAuthor())
+                .commentCount(post.getCommentCount())
+                .viewCount(post.getViewCount())
+                .createdAt(post.getCreatedAt())
+                .recommendationCount(post.getRecommendationCount())
+                .source(post.getSource())
+                .build();
+    }
 }
