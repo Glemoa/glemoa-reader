@@ -1,15 +1,14 @@
 package hyunsub.glemoareader.service;
 
+import hyunsub.glemoareader.common.PageLimitCalculator;
 import hyunsub.glemoareader.domain.Post;
 import hyunsub.glemoareader.dto.PostDto;
+import hyunsub.glemoareader.dto.PostPageResDto;
 import hyunsub.glemoareader.repository.PostRepository;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,73 +76,44 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-
-    public List<PostDto> readRecentPost(String source) {
-        Pageable pageable = PageRequest.of(0, 10);
-
-        List<Post> postLists = postRepository.findBySourceWithLimit(source, pageable);
-
-        List<PostDto> postDtoList = new ArrayList<>();
-        for(Post post : postLists) {
-            postDtoList.add(PostDto.builder()
-                    .id(post.getId())
-                    .title(post.getTitle())
-                    .link(post.getLink())
-                    .author(post.getAuthor())
-                    .commentCount(post.getCommentCount())
-                    .viewCount(post.getViewCount())
-                    .createdAt(post.getCreatedAt())
-                    .recommendationCount(post.getRecommendationCount())
-                    .source(post.getSource())
-                    .build());
-        }
-
-        return postDtoList;
+    public PostPageResDto readRecentPostPaginated(
+            String source, Long page, Long pageSize, Long movablePageCount) {
+        return PostPageResDto.builder()
+                .postDtoList(
+                        postRepository.findRecentPagePostsPaginated(source, (page - 1) * pageSize, pageSize).stream()
+                        .map(PostDto::fromPost)
+                        .toList())
+                .postCount(
+                        PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount)
+                )
+                .build();
     }
 
-    public List<PostDto> readTodayRecommendedPosts(String source) {
-        Pageable pageable = PageRequest.of(0, 10);
-
-        List<Post> postLists = postRepository.findTodayRecommendedPosts(source, LocalDate.now().atStartOfDay(), pageable);
-
-        List<PostDto> postDtoList = new ArrayList<>();
-        for(Post post : postLists) {
-            postDtoList.add(PostDto.builder()
-                    .id(post.getId())
-                    .title(post.getTitle())
-                    .link(post.getLink())
-                    .author(post.getAuthor())
-                    .commentCount(post.getCommentCount())
-                    .viewCount(post.getViewCount())
-                    .createdAt(post.getCreatedAt())
-                    .recommendationCount(post.getRecommendationCount())
-                    .source(post.getSource())
-                    .build());
-        }
-
-        return postDtoList;
+    public PostPageResDto readTodayRecommendedPostsPaginated(
+            String source, Long page, Long pageSize, Long movablePageCount) {
+        return PostPageResDto.builder()
+                .postDtoList(
+                        postRepository.findTodayRecommendedPostsPaginated(
+                                source, LocalDate.now().atStartOfDay(),(page - 1) * pageSize, pageSize).stream()
+                                .map(PostDto::fromPost)
+                                .toList())
+                .postCount(
+                        PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount)
+                )
+                .build();
     }
 
-    public List<PostDto> readTodayViewCountPosts(String source) {
-        Pageable pageable = PageRequest.of(0, 10);
-
-        List<Post> postLists = postRepository.findTodayViewCountPosts(source, LocalDate.now().atStartOfDay(), pageable);
-
-        List<PostDto> postDtoList = new ArrayList<>();
-        for(Post post : postLists) {
-            postDtoList.add(PostDto.builder()
-                    .id(post.getId())
-                    .title(post.getTitle())
-                    .link(post.getLink())
-                    .author(post.getAuthor())
-                    .commentCount(post.getCommentCount())
-                    .viewCount(post.getViewCount())
-                    .createdAt(post.getCreatedAt())
-                    .recommendationCount(post.getRecommendationCount())
-                    .source(post.getSource())
-                    .build());
-        }
-
-        return postDtoList;
+    public PostPageResDto readTodayViewCountPostsPaginated(
+            String source, Long page, Long pageSize, Long movablePageCount) {
+        return PostPageResDto.builder()
+                .postDtoList(
+                        postRepository.findTodayRecommendedPostsPaginated(
+                                        source, LocalDate.now().atStartOfDay(),(page - 1) * pageSize, pageSize).stream()
+                                .map(PostDto::fromPost)
+                                .toList())
+                .postCount(
+                        PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount)
+                )
+                .build();
     }
 }

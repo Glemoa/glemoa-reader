@@ -1,6 +1,7 @@
 package hyunsub.glemoareader.controller;
 
 import hyunsub.glemoareader.dto.PostDto;
+import hyunsub.glemoareader.dto.PostPageResDto;
 import hyunsub.glemoareader.service.PostService;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,17 +26,32 @@ public class PostController {
     }
 
     @GetMapping("/recent-posts")
-    public List<PostDto> readRecentPost(String source) {
-        return postService.readRecentPost(source);
+    public PostPageResDto readRecentPostPaginated(
+            @RequestParam("source") String source,
+            @RequestParam("page") Long page,
+            @RequestParam("pageSize") Long pageSize,
+            @RequestParam("movablePageCount") Long movablePageCount
+    ) {
+        return postService.readRecentPostPaginated(source, page, pageSize, movablePageCount);
     }
 
     @GetMapping("/today-recommended-posts")
-    public List<PostDto> readTodayRecommendedPosts(String source) {
-        return postService.readTodayRecommendedPosts(source);
+    public PostPageResDto readTodayRecommendedPosts(
+            @RequestParam("source") String source,
+            @RequestParam("page") Long page,
+            @RequestParam("pageSize") Long pageSize,
+            @RequestParam("movablePageCount") Long movablePageCount
+    ) {
+        return postService.readTodayRecommendedPostsPaginated(source, page, pageSize, movablePageCount);
     }
 
     @GetMapping("/today-view-count-posts")
-    public List<PostDto> readTodayViewCountPosts(String source) {
-        return postService.readTodayViewCountPosts(source);
+    public PostPageResDto readTodayViewCountPosts(
+            @RequestParam("source") String source,
+            @RequestParam("page") Long page,
+            @RequestParam("pageSize") Long pageSize,
+            @RequestParam("movablePageCount") Long movablePageCount
+    ) {
+        return postService.readTodayViewCountPostsPaginated(source, page, pageSize, movablePageCount);
     }
 }
