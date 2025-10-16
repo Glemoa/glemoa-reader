@@ -85,6 +85,41 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("limit") Long limit);
 
     @Query(
+            value = "SELECT p.* " +
+                    "FROM (" +
+                    "SELECT id FROM post " +
+                    "WHERE source = :source AND created_at >= :startOfDay AND title LIKE %:keyword% " +
+                    "ORDER BY recommendation_count DESC " +
+                    "LIMIT :limit OFFSET :offset" +
+                    ") t LEFT JOIN post p ON t.id = p.id",
+            nativeQuery = true
+    )
+    List<Post> searchTodayRecommendedPostsPaginated(
+            @Param("keyword") String keyword,
+            @Param("source") String source,
+            @Param("startOfDay") LocalDateTime startOfDay,
+            @Param("offset") Long offset,
+            @Param("limit") Long limit);
+
+    @Query(
+            value = "SELECT p.* " +
+                    "FROM (" +
+                    "SELECT id FROM post " +
+                    "WHERE source = :source AND created_at >= :startOfDay AND title LIKE %:keyword% " +
+                    "ORDER BY view_count DESC " +
+                    "LIMIT :limit OFFSET :offset" +
+                    ") t LEFT JOIN post p ON t.id = p.id",
+            nativeQuery = true
+    )
+    List<Post> searchTodayViewCountPostsPaginated(
+            @Param("keyword") String keyword,
+            @Param("source") String source,
+            @Param("startOfDay") LocalDateTime startOfDay,
+            @Param("offset") Long offset,
+            @Param("limit") Long limit);
+
+
+    @Query(
             value = "select count(*) from (" +
                     "   select id from post where source = :source limit :limit" +
                     ") t",
@@ -102,6 +137,29 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     )
     Long count(
             @Param("source") String source,
+            @Param("startOfDay") LocalDateTime startOfDay,
+            @Param("limit") Long limit);
+
+    @Query(
+            value = "select count(*) from (" +
+                    "   select id from post where source = :source AND title LIKE %:keyword% limit :limit" +
+                    ") t",
+            nativeQuery = true
+    )
+    Long searchPostCount(
+            @Param("source") String source,
+            @Param("keyword") String keyword,
+            @Param("limit") Long limit);
+
+    @Query(
+            value = "select count(*) from (" +
+                    "   select id from post where source = :source AND created_at >= :startOfDay AND title LIKE %:keyword% limit :limit" +
+                    ") t",
+            nativeQuery = true
+    )
+    Long searchPostCount(
+            @Param("source") String source,
+            @Param("keyword") String keyword,
             @Param("startOfDay") LocalDateTime startOfDay,
             @Param("limit") Long limit);
 }

@@ -66,23 +66,25 @@ public class PostController {
         return postService.searchPosts(keyword, source, page, pageSize, movablePageCount);
     }
 
-//    @GetMapping("/search-today-recommended-posts")
-//    public PostPageResDto searchTodayRecommendedPosts(
-//            @RequestParam("source") String source,
-//            @RequestParam("page") Long page,
-//            @RequestParam("pageSize") Long pageSize,
-//            @RequestParam("movablePageCount") Long movablePageCount
-//    ) {
-//        return postService.searchTodayRecommendedPostsPaginated(keyword, source, page, pageSize, movablePageCount);
-//    }
-//
-//    @GetMapping("/search-today-view-count-posts")
-//    public PostPageResDto searchTodayViewCountPosts(
-//            @RequestParam("source") String source,
-//            @RequestParam("page") Long page,
-//            @RequestParam("pageSize") Long pageSize,
-//            @RequestParam("movablePageCount") Long movablePageCount
-//    ) {
-//        return postService.searchTodayViewCountPostsPaginated(keyword, source, page, pageSize, movablePageCount);
-//    }
+    @GetMapping("/search-today-recommended-posts")
+    public PostPageResDto searchTodayRecommendedPosts(
+            @RequestParam("keyword") String keyword,
+            @RequestParam("source") String source,
+            @RequestParam("page") Long page,
+            @RequestParam("pageSize") Long pageSize,
+            @RequestParam("movablePageCount") Long movablePageCount
+    ) {
+        return postService.searchTodayRecommendedPostsPaginated(keyword, source, page, pageSize, movablePageCount);
+    }
+
+    @GetMapping("/search-today-view-count-posts")
+    public PostPageResDto searchTodayViewCountPosts(
+            @RequestParam("keyword") String keyword,
+            @RequestParam("source") String source,
+            @RequestParam("page") Long page,
+            @RequestParam("pageSize") Long pageSize,
+            @RequestParam("movablePageCount") Long movablePageCount
+    ) {
+        return postService.searchTodayViewCountPostsPaginated(keyword, source, page, pageSize, movablePageCount);
+    }
 }
