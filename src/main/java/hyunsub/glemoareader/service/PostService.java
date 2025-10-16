@@ -84,7 +84,9 @@ public class PostService {
                         .map(PostDto::fromPost)
                         .toList())
                 .postCount(
-                        PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount)
+                        postRepository.count(
+                                source,
+                                PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount))
                 )
                 .build();
     }
@@ -98,7 +100,10 @@ public class PostService {
                                 .map(PostDto::fromPost)
                                 .toList())
                 .postCount(
-                        PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount)
+                        postRepository.count(
+                                source,
+                                LocalDate.now().atStartOfDay(),
+                                PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount))
                 )
                 .build();
     }
@@ -107,12 +112,62 @@ public class PostService {
             String source, Long page, Long pageSize, Long movablePageCount) {
         return PostPageResDto.builder()
                 .postDtoList(
-                        postRepository.findTodayRecommendedPostsPaginated(
+                        postRepository.findTodayViewCountPostsPaginated(
                                         source, LocalDate.now().atStartOfDay(),(page - 1) * pageSize, pageSize).stream()
                                 .map(PostDto::fromPost)
                                 .toList())
                 .postCount(
-                        PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount)
+                        postRepository.count(
+                                source,
+                                LocalDate.now().atStartOfDay(),
+                                PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount))
+                )
+                .build();
+    }
+
+    public PostPageResDto searchPosts(String keyword, String source, Long page, Long pageSize, Long movablePageCount) {
+        return PostPageResDto.builder()
+                .postDtoList(
+                        postRepository.searchPostsPaginated(keyword, source, (page - 1) * pageSize, pageSize).stream()
+                                .map(PostDto::fromPost)
+                                .toList())
+                .postCount(
+                        postRepository.searchPostCount(
+                                source,
+                                keyword,
+                                PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount))
+                )
+                .build();
+    }
+
+    public PostPageResDto searchTodayRecommendedPostsPaginated(String keyword, String source, Long page, Long pageSize, Long movablePageCount) {
+        return PostPageResDto.builder()
+                .postDtoList(
+                        postRepository.searchTodayRecommendedPostsPaginated(keyword, source, LocalDate.now().atStartOfDay(), (page - 1) * pageSize, pageSize).stream()
+                                .map(PostDto::fromPost)
+                                .toList())
+                .postCount(
+                        postRepository.searchPostCount(
+                                source,
+                                keyword,
+                                LocalDate.now().atStartOfDay(),
+                                PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount))
+                )
+                .build();
+    }
+
+    public PostPageResDto searchTodayViewCountPostsPaginated(String keyword, String source, Long page, Long pageSize, Long movablePageCount) {
+        return PostPageResDto.builder()
+                .postDtoList(
+                        postRepository.searchTodayViewCountPostsPaginated(keyword, source, LocalDate.now().atStartOfDay(), (page - 1) * pageSize, pageSize).stream()
+                                .map(PostDto::fromPost)
+                                .toList())
+                .postCount(
+                        postRepository.searchPostCount(
+                                source,
+                                keyword,
+                                LocalDate.now().atStartOfDay(),
+                                PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount))
                 )
                 .build();
     }
