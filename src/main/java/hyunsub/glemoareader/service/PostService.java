@@ -84,7 +84,9 @@ public class PostService {
                         .map(PostDto::fromPost)
                         .toList())
                 .postCount(
-                        PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount)
+                        postRepository.count(
+                                source,
+                                PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount))
                 )
                 .build();
     }
@@ -98,7 +100,10 @@ public class PostService {
                                 .map(PostDto::fromPost)
                                 .toList())
                 .postCount(
-                        PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount)
+                        postRepository.count(
+                                source,
+                                LocalDate.now().atStartOfDay(),
+                                PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount))
                 )
                 .build();
     }
@@ -112,7 +117,24 @@ public class PostService {
                                 .map(PostDto::fromPost)
                                 .toList())
                 .postCount(
-                        PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount)
+                        postRepository.count(
+                                source,
+                                LocalDate.now().atStartOfDay(),
+                                PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount))
+                )
+                .build();
+    }
+
+    public PostPageResDto searchPosts(String keyword, String source, Long page, Long pageSize, Long movablePageCount) {
+        return PostPageResDto.builder()
+                .postDtoList(
+                        postRepository.searchPostsPaginated(keyword, source, (page - 1) * pageSize, pageSize).stream()
+                                .map(PostDto::fromPost)
+                                .toList())
+                .postCount(
+                        postRepository.count(
+                                source,
+                                PageLimitCalculator.calculatePageLimit(page, pageSize, movablePageCount))
                 )
                 .build();
     }

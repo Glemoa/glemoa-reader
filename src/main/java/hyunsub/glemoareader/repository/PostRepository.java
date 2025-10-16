@@ -69,10 +69,39 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             @Param("limit") Long limit);
 
     @Query(
+            value = "SELECT p.* " +
+                    "FROM (" +
+                    "SELECT id FROM post " +
+                    "WHERE source = :source AND title LIKE %:keyword% " +
+                    "ORDER BY created_at DESC, id DESC " +
+                    "LIMIT :limit OFFSET :offset" +
+                    ") t LEFT JOIN post p ON t.id = p.id",
+            nativeQuery = true
+    )
+    List<Post> searchPostsPaginated(
+            @Param("keyword") String keyword,
+            @Param("source") String source,
+            @Param("offset") Long offset,
+            @Param("limit") Long limit);
+
+    @Query(
             value = "select count(*) from (" +
-                    "   select article_id from article where board_id = :boardId limit :limit" +
+                    "   select id from post where source = :source limit :limit" +
                     ") t",
             nativeQuery = true
     )
-    Long count(@Param("boardId") Long boardId, @Param("limit") Long limit);
+    Long count(
+            @Param("source") String source,
+            @Param("limit") Long limit);
+
+    @Query(
+            value = "select count(*) from (" +
+                    "   select id from post where source = :source AND created_at >= :startOfDay limit :limit" +
+                    ") t",
+            nativeQuery = true
+    )
+    Long count(
+            @Param("source") String source,
+            @Param("startOfDay") LocalDateTime startOfDay,
+            @Param("limit") Long limit);
 }
