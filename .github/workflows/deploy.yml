@@ -96,6 +96,8 @@ jobs:
               \
               -Dserver.port=$APP_PORT \
               \
+              -Djava.io.tmpdir=/tmp \
+              \
               -Deureka.client.serviceUrl.defaultZone=http://${{ secrets.EUREKA_SERVER_URL }}:8761/eureka/ \
               \
               -Dspring.datasource.url=jdbc:mysql://${{ secrets.DB_HOST }}:3306/Glemoa \
