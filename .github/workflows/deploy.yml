@@ -62,7 +62,7 @@ jobs:
           # 🚨 Reader 서비스 배포 디렉토리
           target: "/home/ubuntu/reader/"
 
-      # 3. 서버에서 배포 스크립트 실행 (SSH )
+      # 3. 서버에서 배포 스크립트 실행 (SSH)
       - name: Execute deployment script on server
         uses: appleboy/ssh-action@master
         with:
@@ -95,6 +95,8 @@ jobs:
               -Dspring.profiles.active=prod \
               \
               -Dserver.port=$APP_PORT \
+              \
+              -Djava.io.tmpdir=/tmp \
               \
               -Deureka.client.serviceUrl.defaultZone=http://${{ secrets.EUREKA_SERVER_URL }}:8761/eureka/ \
               \
