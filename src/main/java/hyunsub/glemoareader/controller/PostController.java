@@ -1,8 +1,11 @@
 package hyunsub.glemoareader.controller;
 
+import hyunsub.glemoareader.document.PostDocument;
 import hyunsub.glemoareader.dto.PostDto;
 import hyunsub.glemoareader.dto.PostPageResDto;
+import hyunsub.glemoareader.service.PostSearchElasticService;
 import hyunsub.glemoareader.service.PostService;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,9 +13,11 @@ import java.util.List;
 @RestController
 public class PostController {
     private final PostService postService;
+    private final PostSearchElasticService postSearchElasticService;
 
-    public PostController(PostService postService) {
+    public PostController(PostService postService, PostSearchElasticService postSearchElasticService) {
         this.postService = postService;
+        this.postSearchElasticService = postSearchElasticService;
     }
 
     @GetMapping("/post/{postId}")
@@ -63,7 +68,8 @@ public class PostController {
             @RequestParam("pageSize") Long pageSize,
             @RequestParam("movablePageCount") Long movablePageCount
     ) {
-        return postService.searchPosts(keyword, source, page, pageSize, movablePageCount);
+//        return postService.searchPosts(keyword, source, page, pageSize, movablePageCount);
+        return postSearchElasticService.searchPosts(keyword, source, page, pageSize, movablePageCount);
     }
 
     @GetMapping("/search-today-recommended-posts")
@@ -74,7 +80,8 @@ public class PostController {
             @RequestParam("pageSize") Long pageSize,
             @RequestParam("movablePageCount") Long movablePageCount
     ) {
-        return postService.searchTodayRecommendedPostsPaginated(keyword, source, page, pageSize, movablePageCount);
+//        return postService.searchTodayRecommendedPostsPaginated(keyword, source, page, pageSize, movablePageCount);
+        return postSearchElasticService.searchTodayRecommendedPosts(keyword, source, page, pageSize, movablePageCount);
     }
 
     @GetMapping("/search-today-view-count-posts")
@@ -85,6 +92,7 @@ public class PostController {
             @RequestParam("pageSize") Long pageSize,
             @RequestParam("movablePageCount") Long movablePageCount
     ) {
-        return postService.searchTodayViewCountPostsPaginated(keyword, source, page, pageSize, movablePageCount);
+//        return postService.searchTodayViewCountPostsPaginated(keyword, source, page, pageSize, movablePageCount);
+        return postSearchElasticService.searchTodayViewCountPosts(keyword, source, page, pageSize, movablePageCount);
     }
 }

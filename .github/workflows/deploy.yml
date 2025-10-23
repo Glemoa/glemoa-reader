@@ -90,6 +90,8 @@ jobs:
 
             pkill -f "$JAR_NAME" || true
             sleep 5
+            
+            export ELASTICSEARCH_HOST='${{ secrets.ELASTICSEARCH_HOST }}'
 
             nohup java -jar \
               -Dspring.profiles.active=prod \
