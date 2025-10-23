@@ -1,5 +1,6 @@
 package hyunsub.glemoareader.dto;
 
+import hyunsub.glemoareader.document.PostDocument;
 import hyunsub.glemoareader.domain.Post;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @Builder
@@ -34,6 +36,31 @@ public class PostDto {
                 .createdAt(post.getCreatedAt())
                 .recommendationCount(post.getRecommendationCount())
                 .source(post.getSource())
+                .build();
+    }
+
+    public static PostDto fromPostDocument(PostDocument doc) {
+        if (doc == null) return null;
+
+        LocalDateTime createdAt = null;
+        try {
+            if (doc.getCreatedAt() != null)
+                createdAt = LocalDateTime.parse(doc.getCreatedAt(),
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS"));
+        } catch (Exception e) {
+            // 실패해도 무시
+        }
+
+        return PostDto.builder()
+                .id(Long.valueOf(doc.getId()))
+                .title(doc.getTitle())
+                .author(doc.getAuthor())
+                .source(doc.getSource())
+                .link(doc.getLink())
+                .commentCount(doc.getCommentCount())
+                .viewCount(doc.getViewCount())
+                .recommendationCount(doc.getRecommendationCount())
+                .createdAt(createdAt)
                 .build();
     }
 }
