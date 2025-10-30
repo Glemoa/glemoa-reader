@@ -30,8 +30,8 @@ public class PostDocument {
 
     private Integer commentCount;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
-    private String createdAt;
+    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    private LocalDateTime createdAt;  // String → LocalDateTime
 
     private Integer viewCount;
 
