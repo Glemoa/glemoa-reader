@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 public interface PostSearchRepository extends ElasticsearchRepository<PostDocument, Long> {
@@ -50,7 +51,7 @@ public interface PostSearchRepository extends ElasticsearchRepository<PostDocume
     Page<PostDocument> searchTodayRecommendedPostsPaginated(
             String keyword,
             String source,
-            LocalDateTime startOfDay,  // String → LocalDateTime
+            Instant startOfDay,  // String → LocalDateTime
             Pageable pageable
     );
 
@@ -76,7 +77,7 @@ public interface PostSearchRepository extends ElasticsearchRepository<PostDocume
     Page<PostDocument> searchTodayViewCountPostsPaginated(
             String keyword,
             String source,
-            LocalDateTime startOfDay,  // String → LocalDateTime
+            Instant startOfDay,  // String → LocalDateTime
             Pageable pageable
     );
 

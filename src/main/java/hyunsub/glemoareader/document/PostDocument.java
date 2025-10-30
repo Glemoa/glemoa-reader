@@ -30,10 +30,9 @@ public class PostDocument {
 
     private Integer commentCount;
 
-    // 패턴 명시: 밀리초 포함 형식 처리
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis, pattern = "uuuu-MM-dd'T'HH:mm:ss.SSS")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS", timezone = "Asia/Seoul")
-    private LocalDateTime createdAt;  // String → LocalDateTime
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis, pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSSSS||uuuu-MM-dd'T'HH:mm:ss||uuuu-MM-dd'T'HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private Instant createdAt;  // LocalDateTime → Instant
 
     private Integer viewCount;
 

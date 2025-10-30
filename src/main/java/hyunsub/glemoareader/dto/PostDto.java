@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 @Data
@@ -42,6 +43,12 @@ public class PostDto {
     public static PostDto fromPostDocument(PostDocument doc) {
         if (doc == null) return null;
 
+        LocalDateTime createdAt = null;
+        if (doc.getCreatedAt() != null) {
+            // Instant를 한국 시간 LocalDateTime으로 변환
+            createdAt = LocalDateTime.ofInstant(doc.getCreatedAt(), ZoneId.of("Asia/Seoul"));
+        }
+
         return PostDto.builder()
                 .id(Long.valueOf(doc.getId()))
                 .title(doc.getTitle())
@@ -51,7 +58,7 @@ public class PostDto {
                 .commentCount(doc.getCommentCount())
                 .viewCount(doc.getViewCount())
                 .recommendationCount(doc.getRecommendationCount())
-                .createdAt(doc.getCreatedAt())
+                .createdAt(createdAt)
                 .build();
     }
 }
