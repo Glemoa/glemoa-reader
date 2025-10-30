@@ -42,15 +42,6 @@ public class PostDto {
     public static PostDto fromPostDocument(PostDocument doc) {
         if (doc == null) return null;
 
-        LocalDateTime createdAt = null;
-        try {
-            if (doc.getCreatedAt() != null)
-                createdAt = LocalDateTime.parse(doc.getCreatedAt(),
-                        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS"));
-        } catch (Exception e) {
-            // 실패해도 무시
-        }
-
         return PostDto.builder()
                 .id(Long.valueOf(doc.getId()))
                 .title(doc.getTitle())
@@ -60,7 +51,7 @@ public class PostDto {
                 .commentCount(doc.getCommentCount())
                 .viewCount(doc.getViewCount())
                 .recommendationCount(doc.getRecommendationCount())
-                .createdAt(createdAt)
+                .createdAt(doc.getCreatedAt())
                 .build();
     }
 }
