@@ -10,6 +10,8 @@ server:
   port: 8080
 
 spring:
+  jackson:
+    time-zone: Asia/Seoul
   elasticsearch:
     uris: http://${ELASTICSEARCH_HOST}:9200
     connection-timeout: 10s
