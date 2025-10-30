@@ -12,8 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -48,7 +50,10 @@ public class PostSearchElasticService {
      * 오늘의 추천순 검색
      */
     public PostPageResDto searchTodayRecommendedPosts(String keyword, String source, Long page, Long pageSize, Long movablePageCount) {
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();  // LocalDateTime으로 변경
+        // 오늘 00:00:00을 Instant로 변환
+        Instant startOfDay = LocalDate.now()
+                .atStartOfDay(ZoneId.of("Asia/Seoul"))
+                .toInstant();
 
         Pageable pageable = PageRequest.of(page.intValue() - 1, pageSize.intValue(),
                 Sort.by(Sort.Direction.DESC, "recommendationCount"));
@@ -71,7 +76,10 @@ public class PostSearchElasticService {
      * 오늘의 조회수순 검색
      */
     public PostPageResDto searchTodayViewCountPosts(String keyword, String source, Long page, Long pageSize, Long movablePageCount) {
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();  // LocalDateTime으로 변경
+        // 오늘 00:00:00을 Instant로 변환
+        Instant startOfDay = LocalDate.now()
+                .atStartOfDay(ZoneId.of("Asia/Seoul"))
+                .toInstant();
 
         Pageable pageable = PageRequest.of(page.intValue() - 1, pageSize.intValue(),
                 Sort.by(Sort.Direction.DESC, "viewCount"));
