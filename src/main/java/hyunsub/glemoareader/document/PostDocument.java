@@ -14,16 +14,22 @@ import java.time.ZoneId;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(indexName = "posts") // Elasticsearch 인덱스 이름 지정
-//@Setting(settingPath = "/elasticsearch/posts-settings.json") // 이 줄을 추가
+@Setting(settingPath = "/elasticsearch-posts-settings.json") // <-- 파일 경로 지정
 public class PostDocument {
 
     @Id // Elasticsearch Document의 ID
     private Long id;
 
+    @Field(type = FieldType.Text,
+            analyzer = "korean_ngram",
+            searchAnalyzer = "korean_ngram") // 한글 분석기 사용
     private String title;
 
     private String source;
 
+    @Field(type = FieldType.Text,
+            analyzer = "korean_ngram",
+            searchAnalyzer = "korean_ngram") // 한글 분석기 사용
     private String author;
 
     private String link;

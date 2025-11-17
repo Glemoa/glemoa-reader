@@ -7,7 +7,6 @@ import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 public interface PostSearchRepository extends ElasticsearchRepository<PostDocument, Long> {
 
@@ -22,7 +21,14 @@ public interface PostSearchRepository extends ElasticsearchRepository<PostDocume
       "bool": {
         "must": [
           { "match": { "source": "?1" }},
-          { "match_phrase": { "title": "?0" }}
+          {
+            "match": {
+              "title": {
+                "query": "?0",
+                "operator": "AND"
+              }
+            }
+          }
         ]
       }
     }
@@ -42,7 +48,14 @@ public interface PostSearchRepository extends ElasticsearchRepository<PostDocume
       "bool": {
         "must": [
           { "match": { "source": "?1" }},
-          { "match_phrase": { "title": "?0" }},
+          {
+            "match": {
+              "title": {
+                "query": "?0",
+                "operator": "AND"
+              }
+            }
+          },
           { "range": { "createdAt": { "gte": "?2" }}}
         ]
       }
@@ -68,7 +81,14 @@ public interface PostSearchRepository extends ElasticsearchRepository<PostDocume
       "bool": {
         "must": [
           { "match": { "source": "?1" }},
-          { "match_phrase": { "title": "?0" }},
+          {
+            "match": {
+              "title": {
+                "query": "?0",
+                "operator": "AND"
+              }
+            }
+          },
           { "range": { "createdAt": { "gte": "?2" }}}
         ]
       }
