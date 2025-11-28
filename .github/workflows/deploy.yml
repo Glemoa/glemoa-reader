@@ -73,6 +73,11 @@ jobs:
           script: |
             DEPLOY_DIR="/home/ubuntu/reader"
             mkdir -p $DEPLOY_DIR && cd $DEPLOY_DIR
+            
+            if [ ! -f elastic-apm-agent.jar ]; then
+              echo "Downloading Elastic APM Agent..."
+              wget -O elastic-apm-agent.jar https://search.maven.org/remotecontent?filepath=co/elastic/apm/elastic-apm-agent/1.43.0/elastic-apm-agent-1.43.0.jar
+            fi
 
             APP_PORT=${APP_PORT:-8080}
             echo "Using APP_PORT=$APP_PORT"
@@ -93,7 +98,12 @@ jobs:
             
             export ELASTICSEARCH_HOST='${{ secrets.ELASTICSEARCH_HOST }}'
 
-            nohup java -Xmx384m -jar \
+            nohup java -javaagent:elastic-apm-agent.jar \
+              -Delastic.apm.service_name=glemoa-reader \
+              -Delastic.apm.server_url=http://${{ secrets.ELASTICSEARCH_HOST }}:8200 \
+              -Delastic.apm.application_packages=hyunsub.glemoareader \
+              -Delastic.apm.environment=production \
+              -Xmx384m -jar \
               -Dspring.profiles.active=prod \
               \
               -Dserver.port=$APP_PORT \
