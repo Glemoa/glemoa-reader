@@ -105,6 +105,8 @@ jobs:
               -Delastic.apm.environment=production \
               -Xmx384m -jar \
               -Dspring.profiles.active=prod \
+              -Dspring.elasticsearch.username=elastic \
+              -Dspring.elasticsearch.password=${{ secrets.ELASTICSEARCH_PASSWORD }} \
               \
               -Dserver.port=$APP_PORT \
               \
